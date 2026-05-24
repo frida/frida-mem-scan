@@ -1,6 +1,6 @@
 {
   "name": "frida-mem-scan",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Fast SIMD-accelerated memory scanner for Frida — in-process and cross-process (PID).",
   "author": "Ole André Vadla Ravnås <oleavr@frida.re>",
   "license": "MIT",
