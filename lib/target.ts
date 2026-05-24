@@ -19,7 +19,6 @@ export interface ScanHit {
 
 export class Target {
     readonly memory: ProcessMemory;
-    #scanner: Scanner | null = null;
 
     static self(): Target {
         return new Target(openProcessMemory(Process.id));
@@ -39,16 +38,21 @@ export class Target {
         const filter = opts.filter ?? { readable: true };
         const targetVals = targets.map(normalizeTarget);
         const maskedTargets = targetVals.map(v => v.and(mask));
-        const sc = this.#getScanner();
+        const sc = getScanner();
         const hits: ScanHit[] = [];
+        let buf: NativePointer | null = null;
+        let bufCap = 0;
 
         for (const region of this.memory.regions(filter)) {
             const sz = region.size.toNumber();
-            const buf = Memory.alloc(sz);
-            if (!this.memory.readInto(region.base, buf, sz)) {
+            if (sz > bufCap) {
+                buf = Memory.alloc(sz);
+                bufCap = sz;
+            }
+            if (!this.memory.readInto(region.base, buf!, sz)) {
                 continue;
             }
-            const regionHits = sc.scanRemoteRegion(region.base, buf, sz, mask, targetVals, cap);
+            const regionHits = sc.scanRemoteRegion(region.base, buf!, sz, mask, targetVals, cap);
             const regionInfo = { base: region.base, size: sz, tag: region.tag };
             for (const h of regionHits) {
                 hits.push({
@@ -72,13 +76,15 @@ export class Target {
     regions(filter?: RegionFilter): Iterable<Region> {
         return this.memory.regions(filter);
     }
+}
 
-    #getScanner(): Scanner {
-        if (this.#scanner === null) {
-            this.#scanner = new Scanner();
-        }
-        return this.#scanner;
+let sharedScanner: Scanner | null = null;
+
+function getScanner(): Scanner {
+    if (sharedScanner === null) {
+        sharedScanner = new Scanner();
     }
+    return sharedScanner;
 }
 
 function normalizeTarget(t: TargetSpec): UInt64 {
