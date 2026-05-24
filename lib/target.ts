@@ -55,9 +55,10 @@ export class Target {
             const regionHits = sc.scanRemoteRegion(region.base, buf!, sz, mask, targetVals, cap);
             const regionInfo = { base: region.base, size: sz, tag: region.tag };
             for (const h of regionHits) {
+                const slot = buf!.add(h.index * 8).readU64().and(mask);
                 hits.push({
                     addr: h.value,
-                    target: pickMatchingTarget(maskedTargets, h.value.readU64().and(mask)),
+                    target: pickMatchingTarget(maskedTargets, slot),
                     region: regionInfo,
                 });
             }
