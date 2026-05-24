@@ -1,0 +1,36 @@
+{
+  "name": "frida-mem-scan",
+  "version": "1.0.0",
+  "description": "Fast SIMD-accelerated memory scanner for Frida — in-process and cross-process (PID).",
+  "author": "Ole André Vadla Ravnås <oleavr@frida.re>",
+  "license": "MIT",
+  "repository": "github:oleavr/frida-mem-scan",
+  "keywords": [
+    "cross-process",
+    "frida",
+    "frida-gum",
+    "mach",
+    "memory",
+    "neon",
+    "scanner",
+    "simd",
+    "sse"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "/dist/**/*.js",
+    "/dist/**/*.d.ts"
+  ],
+  "type": "module",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/frida-gum": "^19.1.0",
+    "@types/node": "^18.19.130",
+    "typescript": "^6.0.3"
+  }
+}
